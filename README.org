@@ -14,7 +14,7 @@ http-server -p 8001
 OuteAI published 300M and 65M parameter models, available in both instruct and base versions. 300M models have the Mistral architecture and 65M models have LLaMa architecture [1]. So it made me wonder - can we use it as a simple chat assistant for low-end devices?
 
 So I first built a simple chat application with it.
-[[file:chat application.png]]
+[[file:chat-application.png]]
 
 We then experimented with the responses. We soon noticed one problem. Language models return response equal to its context size. So usually, last part of the response is garbage. Some examples can be:
 
