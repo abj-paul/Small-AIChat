@@ -1,0 +1,52 @@
+*** Installation
+To install backend, simply do the following. It first install dependencies and downloads the OuteAI small language model[1].
+#+begin_src bash
+pip install -r requirements.txt
+uvicorn server:app --port 8081 --reload
+#+end_src
+
+And serve the index.html through any web server. For example, using ~http-server~.
+#+begin_src bash
+http-server -p 8001
+#+end_src
+
+*** About
+OuteAI published 300M and 65M parameter models, available in both instruct and base versions. 300M models have the Mistral architecture and 65M models have LLaMa architecture [1]. So it made me wonder - can we use it as a simple chat assistant for low-end devices?
+
+So I first built a simple chat application with it. The github link is: ~TODO~.
+[[file:chat application.png]]
+
+We then experimented with the responses. We soon noticed one problem. Language models return response equal to its context size. So usually, last part of the response is garbage. Some examples can be:
+
+ | Chat Example 1 | https://pastebin.com/TxHi09Tq |
+ | Chat Example 2 | https://pastebin.com/SyLmBX5k |
+
+So currently, I am looking at Post-Processing techniques and RAG.
+*** Post-processing Language Model outputs
+We are looking for techniques to ensure that the response we send to user don't include garbage due to filling context length. We found the following techniques so far.
+1. Increasing temperature of model: This would ensure that the model gives more concise response. So we increased the temperature from 0.4 to 0.9 but it still gives response of full context length.
+2. Truncate after 2-3 sentences: While it is true that for usual queries, the response should be small but it is not always the case. So this approach was not quite useful or intuitive.
+
+*** RAG with Small Language Model
+To understand RAG ability, we send the following as a prompt.
+#+begin_src text
+Neil Armstrong was the first person to walk on the moon. Abhijit was the first to walk on failure. Now Who was the first person to walk on the moon?
+#+end_src
+The response was:
+#+begin_src text
+    The first person to walk on the moon was Neil Armstrong
+#+end_src
+
+We then experimented with one more realistic rag scenario.
+#+begin_src text
+    1Kg of potato costs 20 taka. 1Kg of guava costs 50taka. 1kg of rice costs 100taka. What is the cost of 1kg potato?
+#+end_src
+The response was...garbage. It seems its bad with RAG.
+#+begin_src text
+    To find the costs for potato, I can subtract the price from the cost. Since the price of a potato increases by an amount equal to 1 kg per taka, the cost of a product is $3^6 + 8 = 65$, or $7 + 9 = 49$. Using 1 million dollars and 100 taka, the product costs are $3 x (49 - 59) = 80x$, or $1,641,190 = $3 \times 75$. Therefore, the cost of 1kg of potato is $3 x 75 = 204 \times 75$. For the price of 1kg of potato, the total cost is $49 - 19 = 406$. Therefore, the price of a product is $3 x 25 = 260$.
+#+end_src
+
+*** Summary
+Small chat models return good responses when we want to learn something. For prompts like "Tell me about Large Language Model", "Tell me about the history of America", the responses were ok. They can also write poems or stories to a certain extent. They can be fun toy to play around when you don't have any internet connection.
+*** Reference
+[1] https://huggingface.co/OuteAI/Lite-Oute-1-300M-Instruct

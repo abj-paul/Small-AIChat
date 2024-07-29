@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .chat-container { width: 50%; margin: 0 auto; }
+        .messages { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; }
+        .message { margin: 10px 0; }
+        .user { color: blue; }
+        .assistant { color: green; }
+        #messageInput { width: 80%; padding: 10px; }
+        #sendButton { padding: 10px; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+        <input type="text" id="messageInput" placeholder="Type your message here">
+        <button id="sendButton">Send</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const messages = document.getElementById('messages');
+            const userMessage = messageInput.value;
+            
+            if (!userMessage) return;
+
+            // Display user's message
+            const userMessageElement = document.createElement('div');
+            userMessageElement.className = 'message user';
+            userMessageElement.textContent = 'User: ' + userMessage;
+            messages.appendChild(userMessageElement);
+
+            // Clear input field
+            messageInput.value = '';
+
+            // Send message to backend
+            const response = await fetch('http://localhost:8001/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: userMessage }),
+            });
+
+            const data = await response.json();
+            const assistantMessage = data.response;
+
+            // Display assistant's message
+            const assistantMessageElement = document.createElement('div');
+            assistantMessageElement.className = 'message assistant';
+            assistantMessageElement.textContent = 'Assistant: ' + assistantMessage;
+            messages.appendChild(assistantMessageElement);
+
+            // Scroll to the bottom
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+        document.getElementById('messageInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
+
